@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile - CBEM</title>
+    <style>
+        /* New Color Palette */
+        :root {
+            --dark-green: #123524;
+            --medium-green: #3E7B27;
+            --light-green: #85A947;
+            --cream: #EFE3C2;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333333;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--dark-gray);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background-color: var(--dark-green);
+            position: fixed;
+            top: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            margin-right: 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .search-bar {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            width: 200px;
+            outline: none;
+        }
+
+        .search-bar i {
+            margin-left: -30px;
+            color: var(--dark-green);
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: var(--dark-green);
+            padding: 20px;
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .mobile-menu.show {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .mobile-menu a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            margin-top: 60px;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--cream);
+            padding: 20px;
+            height: calc(100vh - 60px);
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-green);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .trending-item, .event-item, .friend-item, .group-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(18, 53, 36, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+            padding: 8px;
+        }
+
+        .trending-item:hover, .event-item:hover, .friend-item:hover, .group-item:hover {
+            background-color: rgba(133, 169, 71, 0.2);
+        }
+
+        .trending-item:last-child, .event-item:last-child, .friend-item:last-child, .group-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-item i, .event-item i {
+            margin-right: 10px;
+            color: var(--medium-green);
+        }
+
+        .friend-avatar, .group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .friend-info, .group-info {
+            flex: 1;
+        }
+
+        .friend-name, .group-name {
+            font-weight: 500;
+        }
+
+        .friend-score, .group-members {
+            font-size: 12px;
+            color: var(--dark-green);
+        }
+
+        /* Profile Content */
+        .profile-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 20px;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--cream);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .profile-cover {
+            width: 100%;
+            height: 200px;
+            background-color: var(--light-green);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .profile-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            border: 4px solid var(--white);
+            position: absolute;
+            top: 160px;
+        }
+
+        .profile-info {
+            text-align: center;
+            margin-top: 70px;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .profile-username {
+            color: var(--medium-green);
+            margin-bottom: 15px;
+        }
+
+        .profile-bio {
+            margin-bottom: 20px;
+            max-width: 600px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--dark-gray);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .profile-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .profile-btn.primary {
+            background-color: var(--medium-green);
+            color: white;
+        }
+
+        .profile-btn.primary:hover {
+            background-color: var(--dark-green);
+        }
+
+        .profile-btn.secondary {
+            background-color: var(--cream);
+            color: var(--dark-green);
+            border: 1px solid var(--medium-green);
+        }
+
+        .profile-btn.secondary:hover {
+            background-color: rgba(133, 169, 71, 0.2);
+        }
+
+        /* Profile Tabs */
+        .profile-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .profile-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .profile-tab.active {
+            color: var(--medium-green);
+            font-weight: 500;
+        }
+
+        .profile-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--medium-green);
+        }
+
+        .profile-tab:hover:not(.active) {
+            background-color: var(--light-gray);
+        }
+
+        /* Posts Section */
+        .profile-posts {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .post {
+            background-color: var(--white);
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .post-user {
+            flex: 1;
+        }
+
+        .post-name {
+            font-weight: 600;
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        .post-impact {
+            display: flex;
+            align-items: center;
+            background-color: var(--cream);
+            padding: 8px 12px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .post-impact i {
+            margin-right: 8px;
+            color: var(--medium-green);
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            color: #777;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .post-action:hover {
+            background-color: var(--light-gray);
+        }
+
+        .post-action i {
+            margin-right: 5px;
+        }
+
+        .like-action {
+            color: var(--light-green);
+        }
+
+        .comment-action {
+            color: var(--medium-green);
+        }
+
+        .share-action {
+            color: var(--dark-green);
+        }
+
+        /* Eco Score Section */
+        .eco-score-section {
+            background-color: var(--cream);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .eco-score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .eco-score-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+
+        .eco-score-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--medium-green);
+        }
+
+        .eco-score-progress {
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .eco-score-progress-bar {
+            height: 100%;
+            background-color: var(--medium-green);
+            border-radius: 5px;
+            width: 85%;
+        }
+
+        .eco-score-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .eco-score-category {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--white);
+            border-radius: 5px;
+        }
+
+        .eco-score-category-name {
+            font-weight: 500;
+        }
+
+        .eco-score-category-value {
+            font-weight: bold;
+            color: var(--medium-green);
+        }
+
+        /* Badges Section */
+        .badges-section {
+            background-color: var(--cream);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .badges-header {
+            margin-bottom: 15px;
+        }
+
+        .badges-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+        }
+
+        .badge-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .badge-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            font-size: 24px;
+            color: var(--medium-green);
+        }
+
+        .badge-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Friends Section */
+        .friends-section {
+            background-color: var(--cream);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .friends-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .friends-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+
+        .friends-see-all {
+            color: var(--medium-green);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .friend-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .friend-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .friend-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .friend-score {
+            font-size: 12px;
+            color: var(--dark-green);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 250px;
+            }
+            .profile-content {
+                margin-left: 250px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                display: none;
+            }
+            .profile-content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .profile-posts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar input {
+                width: 150px;
+            }
+            .profile-header {
+                padding: 20px;
+            }
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                top: 150px;
+            }
+            .profile-stats {
+                gap: 15px;
+            }
+            .eco-score-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-links {
+                display: none;
+            }
+            .search-bar {
+                margin-left: auto;
+            }
+            .search-bar input {
+                width: 120px;
+            }
+            .profile-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .profile-btn {
+                width: 100%;
+            }
+            .profile-tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .profile-tab {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">CBEM</div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links">
+            <a href="#"><i class="fas fa-home"></i> Home</a>
+            <a href="#" class="active"><i class="fas fa-user"></i> Profile</a>
+            <a href="#"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="#"><i class="fas fa-envelope"></i> Messages</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search CBEM">
+            <i class="fas fa-search"></i>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#"><i class="fas fa-home"></i> Home</a>
+        <a href="#" class="active"><i class="fas fa-user"></i> Profile</a>
+        <a href="#"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="#"><i class="fas fa-envelope"></i> Messages</a>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-fire"></i> Trending Topics</h3>
+                <div class="trending-item" onclick="navigateTo('#ZeroWasteChallenge')">
+                    <i class="fas fa-leaf"></i> #ZeroWasteChallenge
+                </div>
+                <div class="trending-item" onclick="navigateTo('#PlasticFreeJuly')">
+                    <i class="fas fa-recycle"></i> #PlasticFreeJuly
+                </div>
+                <div class="trending-item" onclick="navigateTo('#UrbanGardening')">
+                    <i class="fas fa-tree"></i> #UrbanGardening
+                </div>
+                <div class="trending-item" onclick="navigateTo('#RenewableEnergy')">
+                    <i class="fas fa-bolt"></i> #RenewableEnergy
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-calendar"></i> Local Events</h3>
+                <div class="event-item" onclick="navigateTo('CommunityTreePlanting')">
+                    <i class="fas fa-seedling"></i> Community Tree Planting - Sat
+                </div>
+                <div class="event-item" onclick="navigateTo('BeachCleanup')">
+                    <i class="fas fa-trash-restore"></i> Beach Cleanup - Sun
+                </div>
+                <div class="event-item" onclick="navigateTo('SolarPowerWorkshop')">
+                    <i class="fas fa-solar-panel"></i> Solar Power Workshop
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-users"></i> Friends</h3>
+                <div class="friend-item" onclick="navigateTo('JaneDoe')">
+                    <div class="friend-avatar">JD</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Jane Doe</div>
+                        <div class="friend-score">Eco Score: 85%</div>
+                    </div>
+                </div>
+                <div class="friend-item" onclick="navigateTo('JohnSmith')">
+                    <div class="friend-avatar">JS</div>
+                    <div class="friend-info">
+                        <div class="friend-name">John Smith</div>
+                        <div class="friend-score">Eco Score: 72%</div>
+                    </div>
+                </div>
+                <div class="friend-item" onclick="navigateTo('AlexMorgan')">
+                    <div class="friend-avatar">AM</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Alex Morgan</div>
+                        <div class="friend-score">Eco Score: 91%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-users"></i> Groups</h3>
+                <div class="group-item" onclick="navigateTo('ZeroWasteLiving')">
+                    <div class="group-avatar"><i class="fas fa-recycle"></i></div>
+                    <div class="group-info">
+                        <div class="group-name">Zero Waste Living</div>
+                        <div class="group-members">1.2k members</div>
+                    </div>
+                </div>
+                <div class="group-item" onclick="navigateTo('UrbanCyclists')">
+                    <div class="group-avatar"><i class="fas fa-bicycle"></i></div>
+                    <div class="group-info">
+                        <div class="group-name">Urban Cyclists</div>
+                        <div class="group-members">856 members</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Profile Content -->
+        <main class="profile-content">
+            <!-- Profile Header -->
+            <section class="profile-header">
+                <div class="profile-cover">
+                    <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Cover photo">
+                </div>
+                <div class="profile-avatar">YP</div>
+                <div class="profile-info">
+                    <h1 class="profile-name">Your Profile</h1>
+                    <div class="profile-username">@ecofriendlyuser</div>
+                    <p class="profile-bio">
+                        Passionate about sustainability and reducing my carbon footprint. 
+                        Sharing my journey towards a zero-waste lifestyle and eco-friendly habits.
+                    </p>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">142</div>
+                            <div class="stat-label">Posts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">356</div>
+                            <div class="stat-label">Friends</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Groups</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">24</div>
+                            <div class="stat-label">Badges</div>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="profile-btn primary">Edit Profile</button>
+                        <button class="profile-btn secondary">Share Profile</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Tabs -->
+            <div class="profile-tabs">
+                <div class="profile-tab active">Posts</div>
+                <div class="profile-tab">About</div>
+                <div class="profile-tab">Friends</div>
+                <div class="profile-tab">Photos</div>
+                <div class="profile-tab">Groups</div>
+                <div class="profile-tab">Events</div>
+            </div>
+
+            <!-- Eco Score Section -->
+            <section class="eco-score-section">
+                <div class="eco-score-header">
+                    <h2 class="eco-score-title">Your Eco Score</h2>
+                    <div class="eco-score-value">85%</div>
+                </div>
+                <div class="eco-score-progress">
+                    <div class="eco-score-progress-bar" style="width: 85%;"></div>
+                </div>
+                <div class="eco-score-details">
+                    <div class="eco-score-category">
+                        <span class="eco-score-category-name">Waste Reduction</span>
+                        <span class="eco-score-category-value">92%</span>
+                    </div>
+                    <div class="eco-score-category">
+                        <span class="eco-score-category-name">Energy Efficiency</span>
+                        <span class="eco-score-category-value">78%</span>
+                    </div>
+                    <div class="eco-score-category">
+                        <span class="eco-score-category-name">Sustainable Transport</span>
+                        <span class="eco-score-category-value">81%</span>
+                    </div>
+                    <div class="eco-score-category">
+                        <span class="eco-score-category-name">Community Impact</span>
+                        <span class="eco-score-category-value">89%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Badges Section -->
+            <section class="badges-section">
+                <div class="badges-header">
+                    <h2 class="badges-title">Your Badges</h2>
+                </div>
+                <div class="badges-grid">
+                    <div class="badge-item">
+                        <div class="badge-icon">
+                            <i class="fas fa-recycle"></i>
+                        </div>
+                        <div class="badge-name">Recycling Hero</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-icon">
+                            <i class="fas fa-bicycle"></i>
+                        </div>
+                        <div class="badge-name">Green Commuter</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="badge-name">Eco Warrior</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-icon">
+                            <i class="fas fa-solar-panel"></i>
+                        </div>
+                        <div class="badge-name">Energy Saver</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <div class="badge-name">Gardener</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-icon">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <div class="badge-name">Water Saver</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Posts Section -->
+            <section class="profile-posts">
+                <!-- Sample Post 1 -->
+                <article class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">YP</div>
+                        <div class="post-user">
+                            <div class="post-name">Your Profile</div>
+                            <div class="post-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        Just switched to a bamboo toothbrush! It's amazing how small changes can make a big difference for our planet. #ZeroWaste #SustainableLiving
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Bamboo toothbrush" class="post-image">
+                    <div class="post-impact">
+                        <i class="fas fa-leaf"></i> Positive environmental impact: Reduces plastic waste by ~4 toothbrushes/year
+                    </div>
+                    <div class="post-actions">
+                        <div class="post-action like-action">
+                            <i class="fas fa-thumbs-up"></i> Like (24)
+                        </div>
+                        <div class="post-action comment-action">
+                            <i class="fas fa-comment"></i> Comment (8)
+                        </div>
+                        <div class="post-action share-action">
+                            <i class="fas fa-share"></i> Share
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Sample Post 2 -->
+                <article class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">YP</div>
+                        <div class="post-user">
+                            <div class="post-name">Your Profile</div>
+                            <div class="post-time">1 day ago</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        Started composting at home! It's easier than I thought and reduces my household waste significantly. Anyone else composting? Any tips?
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1589927986089-35812388d1f4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Compost bin" class="post-image">
+                    <div class="post-impact">
+                        <i class="fas fa-leaf"></i> Positive environmental impact: Diverts ~100kg of waste from landfill annually
+                    </div>
+                    <div class="post-actions">
+                        <div class="post-action like-action">
+                            <i class="fas fa-thumbs-up"></i> Like (42)
+                        </div>
+                        <div class="post-action comment-action">
+                            <i class="fas fa-comment"></i> Comment (15)
+                        </div>
+                        <div class="post-action share-action">
+                            <i class="fas fa-share"></i> Share
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Sample Post 3 -->
+                <article class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">YP</div>
+                        <div class="post-user">
+                            <div class="post-name">Your Profile</div>
+                            <div class="post-time">3 days ago</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        Joined the local community garden this weekend. It's a great way to grow organic food, meet like-minded people, and reduce food miles!
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1592595896616-cfc59247e2b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Community garden" class="post-image">
+                    <div class="post-impact">
+                        <i class="fas fa-leaf"></i> Positive environmental impact: Saves ~500kg CO2 emissions annually
+                    </div>
+                    <div class="post-actions">
+                        <div class="post-action like-action">
+                            <i class="fas fa-thumbs-up"></i> Like (36)
+                        </div>
+                        <div class="post-action comment-action">
+                            <i class="fas fa-comment"></i> Comment (12)
+                        </div>
+                        <div class="post-action share-action">
+                            <i class="fas fa-share"></i> Share
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Friends Section -->
+            <section class="friends-section">
+                <div class="friends-header">
+                    <h2 class="friends-title">Friends</h2>
+                    <div class="friends-see-all">See All</div>
+                </div>
+                <div class="friends-grid">
+                    <div class="friend-card" onclick="navigateTo('JaneDoe')">
+                        <div class="friend-avatar">JD</div>
+                        <div class="friend-name">Jane Doe</div>
+                        <div class="friend-score">Eco Score: 85%</div>
+                    </div>
+                    <div class="friend-card" onclick="navigateTo('JohnSmith')">
+                        <div class="friend-avatar">JS</div>
+                        <div class="friend-name">John Smith</div>
+                        <div class="friend-score">Eco Score: 72%</div>
+                    </div>
+                    <div class="friend-card" onclick="navigateTo('AlexMorgan')">
+                        <div class="friend-avatar">AM</div>
+                        <div class="friend-name">Alex Morgan</div>
+                        <div class="friend-score">Eco Score: 91%</div>
+                    </div>
+                    <div class="friend-card" onclick="navigateTo('SarahJohnson')">
+                        <div class="friend-avatar">SJ</div>
+                        <div class="friend-name">Sarah Johnson</div>
+                        <div class="friend-score">Eco Score: 78%</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- AI Window -->
+    <div class="ai-window">
+        <div class="ai-header" id="ai-toggle">
+            <div class="ai-avatar"><i class="fas fa-leaf"></i></div>
+            <div class="ai-title">Environmental Assistant</div>
+            <i class="fas fa-chevron-down" id="ai-chevron"></i>
+        </div>
+        <div class="ai-body" id="ai-body">
+            <div class="ai-message ai">
+            Hello! I'm your environmental assistant. I can help you with sustainability tips, carbon footprint calculations, and eco-friendly alternatives. How can I help today?
+            </div>
+            
+            <div class="ai-quick-actions">
+            <div class="ai-quick-action" data-question="How can I improve my Eco Score?">
+                <i class="fas fa-chart-line"></i> Improve Score
+            </div>
+            <div class="ai-quick-action" data-question="What are some sustainable products I can use?">
+                <i class="fas fa-shopping-bag"></i> Eco Products
+            </div>
+            <div class="ai-quick-action" data-question="How does composting help the environment?">
+                <i class="fas fa-recycle"></i> Composting Info
+            </div>
+            <div class="ai-quick-action" data-question="Where can I find local sustainability events?">
+                <i class="fas fa-calendar"></i> Local Events
+            </div>
+            </div>
+            
+            <div class="ai-suggestion" id="context-suggestion">
+            Based on your recent posts, would you like tips for sustainable oral care products?
+            </div>
+            
+            <div class="ai-input">
+            <input type="text" id="ai-input" placeholder="Ask me about environmental help...">
+            <button id="ai-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        </div>
+
+        <script>
+        const aiToggle = document.getElementById('ai-toggle');
+        const aiBody = document.getElementById('ai-body');
+        const aiChevron = document.getElementById('ai-chevron');
+
+        aiToggle.addEventListener('click', () => {
+            aiBody.classList.toggle('show');
+            aiChevron.classList.toggle('fa-chevron-down');
+            aiChevron.classList.toggle('fa-chevron-up');
+        });
+
+        const quickActions = document.querySelectorAll('.ai-quick-action');
+        quickActions.forEach(action => {
+            action.addEventListener('click', () => {
+            const question = action.getAttribute('data-question');
+            document.getElementById('ai-input').value = question;
+            });
+        });
+
+        document.getElementById('ai-send').addEventListener('click', () => {
+            const userInput = document.getElementById('ai-input').value;
+            if (userInput.trim()) {
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('ai-message', 'user');
+            userMessage.textContent = userInput;
+            aiBody.appendChild(userMessage);
+            document.getElementById('ai-input').value = '';
+            aiBody.scrollTop = aiBody.scrollHeight;
+
+            // Simulate AI response
+            setTimeout(() => {
+                const aiResponse = document.createElement('div');
+                aiResponse.classList.add('ai-message', 'ai');
+                aiResponse.textContent = "Thanks for your question! I'll get back to you shortly.";
+                aiBody.appendChild(aiResponse);
+                aiBody.scrollTop = aiBody.scrollHeight;
+            }, 1000);
+            }
+        });
+        </script>
+    </body>
+    </html>

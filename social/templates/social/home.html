@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBEM - Environmental Social Platform</title>
+    <style>
+        /* Color Palette */
+        :root {
+            --dark-teal: #328E6E;
+            --medium-green: #67AE6E;
+            --light-green: #90C67C;
+            --cream-green: #E1EEBC;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333333;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--dark-gray);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background-color: var(--dark-teal);
+            position: fixed;
+            top: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            margin-right: 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .search-bar {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            width: 200px;
+            outline: none;
+        }
+
+        .search-bar i {
+            margin-left: -30px;
+            color: var(--dark-teal);
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            margin-top: 60px;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--cream-green);
+            padding: 20px;
+            height: calc(100vh - 60px);
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-teal);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .trending-item, .event-item, .friend-item, .group-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(50, 142, 110, 0.1);
+        }
+
+        .trending-item:last-child, .event-item:last-child, .friend-item:last-child, .group-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-item i, .event-item i {
+            margin-right: 10px;
+            color: var(--medium-green);
+        }
+
+        .friend-avatar, .group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .friend-info, .group-info {
+            flex: 1;
+        }
+
+        .friend-name, .group-name {
+            font-weight: 500;
+        }
+
+        .friend-score, .group-members {
+            font-size: 12px;
+            color: var(--dark-teal);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 20px;
+            max-width: 600px;
+        }
+
+        .post-creator {
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-creator-top {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-input {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .post-input input, .post-input textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            resize: none;
+        }
+
+        .post-input textarea {
+            min-height: 80px;
+            border-radius: 10px;
+        }
+
+        .post-input input:focus, .post-input textarea:focus {
+            border-color: var(--medium-green);
+        }
+
+        .post-actions-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .post-media-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .post-media-action {
+            cursor: pointer;
+            color: var(--medium-green);
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .post-media-action:hover {
+            background-color: rgba(103, 174, 110, 0.1);
+        }
+
+        .post-submit-btn {
+            background-color: var(--medium-green);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .post-submit-btn:hover {
+            background-color: var(--dark-teal);
+        }
+
+        .post-submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-preview {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .post {
+            background-color: var(--white);
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .post-user {
+            flex: 1;
+        }
+
+        .post-name {
+            font-weight: 600;
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .post-impact {
+            display: flex;
+            align-items: center;
+            background-color: var(--cream-green);
+            padding: 8px 12px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .post-impact i {
+            margin-right: 8px;
+            color: var(--medium-green);
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            color: #777;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .post-action:hover {
+            background-color: var(--light-gray);
+        }
+
+        .post-action i {
+            margin-right: 5px;
+        }
+
+        .like-action {
+            color: var(--light-green);
+        }
+
+        .comment-action {
+            color: var(--medium-green);
+        }
+
+        .retweet-action {
+            color: var(--dark-teal);
+        }
+
+        .post-options {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .post-options-menu {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background-color: white;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
+            display: none;
+        }
+
+        .post-options-menu.show {
+            display: block;
+        }
+
+        .post-option {
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .post-option:hover {
+            background-color: var(--light-gray);
+        }
+
+        .post-option.edit {
+            color: var(--medium-green);
+        }
+
+        .post-option.delete {
+            color: #e74c3c;
+        }
+
+        .edit-post-form {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .edit-post-form.show {
+            display: block;
+        }
+
+        /* AI Window */
+        .ai-window {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background-color: var(--cream-green);
+            border: 2px solid var(--medium-green);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .ai-window.minimized {
+            transform: translateY(calc(100% - 45px));
+        }
+
+        .ai-header {
+            background-color: var(--medium-green);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .ai-title {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .ai-avatar {
+            width: 30px;
+            height: 30px;
+            background-color: var(--cream-green);
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--medium-green);
+        }
+
+        .ai-body {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .ai-body.hidden {
+            display: none;
+        }
+
+        .ai-message {
+            background-color: var(--white);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .ai-message.user {
+            background-color: var(--light-green);
+            color: white;
+            margin-left: 20px;
+        }
+
+        .ai-message.ai {
+            background-color: var(--white);
+            margin-right: 20px;
+        }
+
+        .ai-quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .ai-quick-action {
+            background-color: var(--white);
+            border: 1px solid var(--medium-green);
+            color: var(--dark-teal);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ai-quick-action:hover {
+            background-color: var(--medium-green);
+            color: white;
+        }
+
+        .ai-input {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .ai-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px 0 0 20px;
+            outline: none;
+        }
+
+        .ai-input button {
+            background-color: var(--medium-green);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+        }
+
+        .ai-suggestion {
+            font-size: 12px;
+            color: var(--dark-teal);
+            margin-top: 10px;
+            padding: 8px;
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .ai-suggestion:hover {
+            background-color: var(--white);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 250px;
+            }
+            .main-content {
+                margin-left: 250px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .ai-window {
+                width: 300px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .search-bar {
+                margin-left: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">CBEM</div>
+        <div class="nav-links">
+            <a href="#"><i class="fas fa-home"></i> Home</a>
+            <a href="#"><i class="fas fa-user"></i> Profile</a>
+            <a href="#"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="#"><i class="fas fa-envelope"></i> Messages</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search CBEM">
+            <i class="fas fa-search"></i>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-fire"></i> Trending Topics</h3>
+                <div class="trending-item">
+                    <i class="fas fa-leaf"></i> #ZeroWasteChallenge
+                </div>
+                <div class="trending-item">
+                    <i class="fas fa-recycle"></i> #PlasticFreeJuly
+                </div>
+                <div class="trending-item">
+                    <i class="fas fa-tree"></i> #UrbanGardening
+                </div>
+                <div class="trending-item">
+                    <i class="fas fa-bolt"></i> #RenewableEnergy
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-calendar"></i> Local Events</h3>
+                <div class="event-item">
+                    <i class="fas fa-seedling"></i> Community Tree Planting - Sat
+                </div>
+                <div class="event-item">
+                    <i class="fas fa-trash-restore"></i> Beach Cleanup - Sun
+                </div>
+                <div class="event-item">
+                    <i class="fas fa-solar-panel"></i> Solar Power Workshop
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-users"></i> Friends</h3>
+                <div class="friend-item">
+                    <div class="friend-avatar">JD</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Jane Doe</div>
+                        <div class="friend-score">Eco Score: 85%</div>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-avatar">JS</div>
+                    <div class="friend-info">
+                        <div class="friend-name">John Smith</div>
+                        <div class="friend-score">Eco Score: 72%</div>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-avatar">AM</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Alex Morgan</div>
+                        <div class="friend-score">Eco Score: 91%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-users"></i> Groups</h3>
+                <div class="group-item">
+                    <div class="group-avatar"><i class="fas fa-recycle"></i></div>
+                    <div class="group-info">
+                        <div class="group-name">Zero Waste Living</div>
+                        <div class="group-members">1.2k members</div>
+                    </div>
+                </div>
+                <div class="group-item">
+                    <div class="group-avatar"><i class="fas fa-bicycle"></i></div>
+                    <div class="group-info">
+                        <div class="group-name">Urban Cyclists</div>
+                        <div class="group-members">856 members</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Post Creator -->
+            <div class="post-creator">
+                <div class="post-creator-top">
+                    <div class="post-avatar">YP</div>
+                    <div class="post-input">
+                        <textarea id="new-post-input" placeholder="Share your environmental thoughts..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="image-preview-container" id="image-preview-container"></div>
+                
+                <div class="post-actions-container">
+                    <div class="post-media-actions">
+                        <div class="post-media-action" id="add-image-btn">
+                            <i class="fas fa-image"></i> Add Image
+                            <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                    <button class="post-submit-btn" id="post-submit-btn" disabled>Post</button>
+                </div>
+            </div>
+
+            <!-- Posts will be dynamically added here -->
+            <div id="posts-container">
+                <!-- Sample posts will be added by JavaScript -->
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Window -->
+    <div class="ai-window">
+        <div class="ai-header" id="ai-toggle">
+            <div class="ai-avatar"><i class="fas fa-leaf"></i></div>
+            <div class="ai-title">Environmental Assistant</div>
+            <i class="fas fa-chevron-down" id="ai-chevron"></i>
+        </div>
+        <div class="ai-body" id="ai-body">
+            <div class="ai-message ai">
+                Hello! I'm your environmental assistant. I can help you with sustainability tips, carbon footprint calculations, and eco-friendly alternatives. How can I help today?
+            </div>
+            
+            <div class="ai-quick-actions">
+                <div class="ai-quick-action" data-question="How can I reduce my carbon footprint?">
+                    <i class="fas fa-footprint"></i> Calculate Footprint
+                </div>
+                <div class="ai-quick-action" data-question="Where can I recycle electronics near me?">
+                    <i class="fas fa-recycle"></i> Recycling Info
+                </div>
+                <div class="ai-quick-action" data-question="What are some energy saving tips for my home?">
+                    <i class="fas fa-lightbulb"></i> Energy Savings
+                </div>
+                <div class="ai-quick-action" data-question="What are eco-friendly alternatives to plastic bags?">
+                    <i class="fas fa-shopping-bag"></i> Eco Products
+                </div>
+            </div>
+            
+            <div class="ai-suggestion" id="context-suggestion">
+                Based on recent posts, would you like tips for sustainable oral care products?
+            </div>
+            
+            <div class="ai-input">
+                <input type="text" id="ai-input" placeholder="Ask me about environmental help...">
+                <button id="ai-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample posts data
+            let samplePosts = [
+                {
+                    id: 1,
+                    avatar: 'JD',
+                    name: 'Jane Doe',
+                    time: '2 hours ago',
+                    content: 'Just switched to a bamboo toothbrush! It\'s amazing how small changes can make a big difference for our planet. #ZeroWaste #SustainableLiving',
+                    images: ['https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'],
+                    impact: 'Positive environmental impact: Reduces plastic waste by ~4 toothbrushes/year',
+                    likes: 24,
+                    comments: 8,
+                    retweets: 5,
+                    liked: false,
+                    retweeted: false,
+                    isEditing: false
+                },
+                {
+                    id: 2,
+                    avatar: 'JS',
+                    name: 'John Smith',
+                    time: '5 hours ago',
+                    content: 'Our community garden produced over 200kg of vegetables this season! Sharing with neighbors and reducing food miles. Anyone want to join us next weekend?',
+                    images: ['https://images.unsplash.com/photo-1592595896616-cfc59247e2b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'],
+                    impact: 'Positive environmental impact: Saves ~500kg CO2 emissions annually',
+                    likes: 42,
+                    comments: 15,
+                    retweets: 12,
+                    liked: false,
+                    retweeted: false,
+                    isEditing: false
+                }
+            ];
+
+            // AI responses database
+            const aiResponses = {
+                "default": "I'm happy to help with environmental questions! Here's some general advice: Reduce, reuse, recycle. Consider your carbon footprint in daily choices. Small changes collectively make a big difference.",
+                "How can I reduce my carbon footprint?": "Here are 5 ways to reduce your carbon footprint:\n1. Use public transport, bike, or walk instead of driving\n2. Reduce meat consumption, especially beef\n3. Switch to renewable energy sources\n4. Improve home insulation to reduce heating/cooling needs\n5. Buy local and seasonal produce",
+                "Where can I recycle electronics near me?": "Based on your location (assuming urban area), you can recycle electronics at:\n- Local municipal recycling centers\n- Best Buy or Staples stores\n- Special e-waste collection events\n- Manufacturer take-back programs\nCheck Earth911.com for specific locations near you!",
+                "What are some energy saving tips for my home?": "Energy saving tips for your home:\n• Switch to LED bulbs\n• Install a programmable thermostat\n• Seal windows and doors to prevent drafts\n• Wash clothes in cold water\n• Unplug devices when not in use\n• Consider solar panels if feasible",
+                "What are eco-friendly alternatives to plastic bags?": "Great alternatives to plastic bags:\n• Reusable cotton or jute bags\n• Beeswax wraps for food storage\n• Glass or stainless steel containers\n• Silicone storage bags\n• Paper bags (recyclable)\n• Bring your own containers to bulk stores",
+                "bamboo toothbrush": "Bamboo toothbrushes are an excellent eco-friendly choice! Benefits:\n- Biodegradable handle (unlike plastic)\n- Often come with recyclable bristles\n- Reduce plastic waste (4+ toothbrushes/year per person)\n- Sustainable bamboo grows quickly without pesticides",
+                "community garden": "Community gardens have multiple environmental benefits:\n• Reduce food transportation emissions\n• Increase green spaces in urban areas\n• Promote biodiversity\n• Reduce food packaging waste\n• Educate communities about sustainable practices\n• Improve soil quality through organic methods"
+            };
+
+            // DOM elements
+            const postsContainer = document.getElementById('posts-container');
+            const newPostInput = document.getElementById('new-post-input');
+            const postSubmitBtn = document.getElementById('post-submit-btn');
+            const addImageBtn = document.getElementById('add-image-btn');
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const aiToggle = document.getElementById('ai-toggle');
+            const aiBody = document.getElementById('ai-body');
+            const aiChevron = document.getElementById('ai-chevron');
+            const aiInput = document.getElementById('ai-input');
+            const aiSend = document.getElementById('ai-send');
+            const contextSuggestion = document.getElementById('context-suggestion');
+            const quickActions = document.querySelectorAll('.ai-quick-action');
+
+            // Current state
+            let currentImages = [];
+            let currentEditingPostId = null;
+
+            // Initialize posts
+            renderPosts();
+
+            // Enable/disable post button based on input
+            newPostInput.addEventListener('input', function() {
+                postSubmitBtn.disabled = this.value.trim() === '' && currentImages.length === 0;
+            });
+
+            // Post creation
+            postSubmitBtn.addEventListener('click', createPost);
+            newPostInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!postSubmitBtn.disabled) {
+                        createPost();
+                    }
+                }
+            });
+
+            // Image upload
+            addImageBtn.addEventListener('click', function() {
+                imageUpload.click();
+            });
+
+            imageUpload.addEventListener('change', function(e) {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                currentImages.push(event.target.result);
+                                renderImagePreviews();
+                                postSubmitBtn.disabled = newPostInput.value.trim() === '' && currentImages.length === 0;
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    }
+                }
+            });
+
+            // AI window toggle
+            let aiMinimized = false;
+            aiToggle.addEventListener('click', function() {
+                aiMinimized = !aiMinimized;
+                if (aiMinimized) {
+                    aiBody.classList.add('hidden');
+                    aiChevron.classList.remove('fa-chevron-down');
+                    aiChevron.classList.add('fa-chevron-up');
+                    document.querySelector('.ai-window').classList.add('minimized');
+                } else {
+                    aiBody.classList.remove('hidden');
+                    aiChevron.classList.remove('fa-chevron-up');
+                    aiChevron.classList.add('fa-chevron-down');
+                    document.querySelector('.ai-window').classList.remove('minimized');
+                }
+            });
+
+            // AI quick actions
+            quickActions.forEach(action => {
+                action.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    askAI(question);
+                });
+            });
+
+            // AI suggestion click
+            contextSuggestion.addEventListener('click', function() {
+                const suggestionText = this.textContent.replace('Based on recent posts, would you like tips for ', '').replace('?', '');
+                askAI(suggestionText);
+            });
+
+            // AI send message
+            aiSend.addEventListener('click', sendAIMessage);
+            aiInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendAIMessage();
+                }
+            });
+
+            // Create post function
+            function createPost() {
+                const content = newPostInput.value.trim();
+                if (content === '' && currentImages.length === 0) return;
+
+                let newPost;
+                
+                if (currentEditingPostId !== null) {
+                    // Update existing post
+                    const postIndex = samplePosts.findIndex(post => post.id === currentEditingPostId);
+                    if (postIndex !== -1) {
+                        samplePosts[postIndex].content = content;
+                        samplePosts[postIndex].images = [...currentImages];
+                        samplePosts[postIndex].impact = detectEnvironmentalImpact(content);
+                        samplePosts[postIndex].isEditing = false;
+                    }
+                    currentEditingPostId = null;
+                } else {
+                    // Create new post
+                    newPost = {
+                        id: samplePosts.length > 0 ? Math.max(...samplePosts.map(p => p.id)) + 1 : 1,
+                        avatar: 'YP',
+                        name: 'You',
+                        time: 'Just now',
+                        content: content,
+                        images: [...currentImages],
+                        impact: detectEnvironmentalImpact(content),
+                        likes: 0,
+                        comments: 0,
+                        retweets: 0,
+                        liked: false,
+                        retweeted: false,
+                        isEditing: false
+                    };
+                    samplePosts.unshift(newPost);
+                }
+
+                renderPosts();
+                newPostInput.value = '';
+                currentImages = [];
+                imagePreviewContainer.innerHTML = '';
+                postSubmitBtn.disabled = true;
+                imageUpload.value = '';
+            }
+
+            // Render image previews
+            function renderImagePreviews() {
+                imagePreviewContainer.innerHTML = '';
+                currentImages.forEach((image, index) => {
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview';
+                    preview.innerHTML = `
+                        <img src="${image}" alt="Preview">
+                        <button class="remove-image" data-index="${index}">&times;</button>
+                    `;
+                    imagePreviewContainer.appendChild(preview);
+                });
+
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-image').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        currentImages.splice(index, 1);
+                        renderImagePreviews();
+                        postSubmitBtn.disabled = newPostInput.value.trim() === '' && currentImages.length === 0;
+                    });
+                });
+            }
+
+            // Render posts function
+            function renderPosts() {
+                postsContainer.innerHTML = '';
+                samplePosts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post';
+                    
+                    if (post.isEditing) {
+                        postElement.innerHTML = `
+                            <div class="post-header">
+                                <div class="post-avatar">${post.avatar}</div>
+                                <div class="post-user">
+                                    <div class="post-name">${post.name}</div>
+                                    <div class="post-time">${post.time}</div>
+                                </div>
+                            </div>
+                            <div class="edit-post-form show">
+                                <textarea class="edit-post-input" style="width: 100%; margin-bottom: 10px;">${post.content}</textarea>
+                                <div class="image-preview-container" id="edit-image-preview-${post.id}"></div>
+                                <div class="post-actions-container">
+                                    <div class="post-media-actions">
+                                        <div class="post-media-action" onclick="document.getElementById('edit-image-upload-${post.id}').click()">
+                                            <i class="fas fa-image"></i> Add Image
+                                            <input type="file" id="edit-image-upload-${post.id}" accept="image/*" style="display: none;">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="post-submit-btn" onclick="savePostChanges(${post.id})">Save</button>
+                                        <button class="post-submit-btn" style="background-color: #ccc; margin-left: 5px;" onclick="cancelEdit(${post.id})">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Render existing images in edit mode
+                        const editImagePreview = postElement.querySelector(`#edit-image-preview-${post.id}`);
+                        post.images.forEach((image, index) => {
+                            const preview = document.createElement('div');
+                            preview.className = 'image-preview';
+                            preview.innerHTML = `
+                                <img src="${image}" alt="Preview">
+                                <button class="remove-image" data-index="${index}" onclick="removeEditImage(${post.id}, ${index})">&times;</button>
+                            `;
+                            editImagePreview.appendChild(preview);
+                        });
+                        
+                        // Handle new image uploads in edit mode
+                        const editImageUpload = postElement.querySelector(`#edit-image-upload-${post.id}`);
+                        editImageUpload.addEventListener('change', function(e) {
+                            const files = e.target.files;
+                            if (files.length > 0) {
+                                for (let i = 0; i < files.length; i++) {
+                                    const file = files[i];
+                                    if (file.type.startsWith('image/')) {
+                                        const reader = new FileReader();
+                                        reader.onload = function(event) {
+                                            post.images.push(event.target.result);
+                                            renderPosts();
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        postElement.innerHTML = `
+                            <div class="post-header">
+                                <div class="post-avatar">${post.avatar}</div>
+                                <div class="post-user">
+                                    <div class="post-name">${post.name}</div>
+                                    <div class="post-time">${post.time}</div>
+                                </div>
+                                ${post.name === 'You' ? `
+                                <div class="post-options" data-id="${post.id}">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <div class="post-options-menu" id="options-menu-${post.id}">
+                                        <div class="post-option edit" data-action="edit">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </div>
+                                        <div class="post-option delete" data-action="delete">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                            <div class="post-content">
+                                ${post.content}
+                            </div>
+                            ${post.images.length > 0 ? post.images.map(image => `
+                                <img src="${image}" alt="Post image" class="post-image">
+                            `).join('') : ''}
+                            ${post.impact ? `<div class="post-impact">
+                                <i class="fas fa-leaf"></i> ${post.impact}
+                            </div>` : ''}
+                            <div class="post-actions">
+                                <div class="post-action like-action ${post.liked ? 'active' : ''}" data-id="${post.id}" data-action="like">
+                                    <i class="fas fa-thumbs-up"></i> Like (${post.likes})
+                                </div>
+                                <div class="post-action comment-action" data-id="${post.id}" data-action="comment">
+                                    <i class="fas fa-comment"></i> Comment (${post.comments})
+                                </div>
+                                <div class="post-action retweet-action ${post.retweeted ? 'active' : ''}" data-id="${post.id}" data-action="retweet">
+                                    <i class="fas fa-retweet"></i> Retweet (${post.retweets})
+                                </div>
+                            </div>
+                        `;
+                    }
+                    postsContainer.appendChild(postElement);
+                });
+
+                // Add event listeners to action buttons
+                document.querySelectorAll('.post-action').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const postId = parseInt(this.getAttribute('data-id'));
+                        const action = this.getAttribute('data-action');
+                        handlePostAction(postId, action, this);
+                    });
+                });
+
+                // Add event listeners to post options
+                document.querySelectorAll('.post-options').forEach(options => {
+                    options.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const postId = parseInt(this.getAttribute('data-id'));
+                        const menu = document.getElementById(`options-menu-${postId}`);
+                        menu.classList.toggle('show');
+                    });
+                });
+
+                // Close options menus when clicking elsewhere
+                document.addEventListener('click', function() {
+                    document.querySelectorAll('.post-options-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                });
+
+                // Add event listeners to options menu items
+                document.querySelectorAll('.post-option').forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const postId = parseInt(this.closest('.post-options').getAttribute('data-id'));
+                        const action = this.getAttribute('data-action');
+                        handlePostOption(postId, action);
+                    });
+                });
+            }
+
+            // Handle post options (edit, delete)
+            function handlePostOption(postId, action) {
+                const post = samplePosts.find(p => p.id === postId);
+                if (!post) return;
+
+                switch(action) {
+                    case 'edit':
+                        currentEditingPostId = postId;
+                        newPostInput.value = post.content;
+                        currentImages = [...post.images];
+                        renderImagePreviews();
+                        postSubmitBtn.disabled = false;
+                        
+                        // Scroll to post creator
+                        document.querySelector('.post-creator').scrollIntoView({ behavior: 'smooth' });
+                        break;
+                    case 'delete':
+                        if (confirm('Are you sure you want to delete this post?')) {
+                            samplePosts = samplePosts.filter(p => p.id !== postId);
+                            renderPosts();
+                        }
+                        break;
+                }
+            }
+
+            // Handle post actions (like, comment, retweet)
+            function handlePostAction(postId, action, element) {
+                const post = samplePosts.find(p => p.id === postId);
+                if (!post) return;
+
+                switch(action) {
+                    case 'like':
+                        post.liked = !post.liked;
+                        post.likes += post.liked ? 1 : -1;
+                        element.classList.toggle('active');
+                        element.innerHTML = `<i class="fas fa-thumbs-up"></i> Like (${post.likes})`;
+                        break;
+                    case 'retweet':
+                        post.retweeted = !post.retweeted;
+                        post.retweets += post.retweeted ? 1 : -1;
+                        element.classList.toggle('active');
+                        element.innerHTML = `<i class="fas fa-retweet"></i> Retweet (${post.retweets})`;
+                        break;
+                    case 'comment':
+                        // In a real app, this would open a comment modal
+                        alert('Comment functionality would open a dialog in a full implementation');
+                        break;
+                }
+            }
+
+            // Detect environmental impact from post content
+            function detectEnvironmentalImpact(content) {
+                content = content.toLowerCase();
+                if (content.includes('bamboo toothbrush') || content.includes('bamboo brush')) {
+                    return 'Positive environmental impact: Reduces plastic waste by ~4 toothbrushes/year';
+                } else if (content.includes('community garden') || content.includes('urban garden')) {
+                    return 'Positive environmental impact: Saves ~500kg CO2 emissions annually';
+                } else if (content.includes('recycle') || content.includes('recycling')) {
+                    return 'Positive environmental impact: Reduces landfill waste and conserves resources';
+                } else if (content.includes('bike') || content.includes('cycling') || content.includes('bicycle')) {
+                    return 'Positive environmental impact: Reduces transportation emissions by 100%';
+                }
+                return 'Positive environmental impact: Raising awareness about sustainability';
+            }
+
+            // Update AI suggestion based on post content
+            function updateAISuggestion(content) {
+                content = content.toLowerCase();
+                if (content.includes('bamboo') && content.includes('toothbrush')) {
+                    contextSuggestion.textContent = 'Based on recent posts, would you like tips for sustainable oral care products?';
+                } else if (content.includes('garden') || content.includes('vegetable')) {
+                    contextSuggestion.textContent = 'Based on recent posts, would you like information about urban gardening benefits?';
+                } else if (content.includes('plastic') || content.includes('waste')) {
+                    contextSuggestion.textContent = 'Based on recent posts, would you like alternatives to single-use plastics?';
+                } else if (content.includes('energy') || content.includes('solar') || content.includes('wind')) {
+                    contextSuggestion.textContent = 'Based on recent posts, would you like tips for reducing energy consumption?';
+                }
+            }
+
+            // Ask AI a question
+            function askAI(question) {
+                // Add user question to chat
+                addAIMessage(question, 'user');
+                
+                // Find response or use default
+                let response = aiResponses.default;
+                for (const [key, value] of Object.entries(aiResponses)) {
+                    if (question.toLowerCase().includes(key.toLowerCase())) {
+                        response = value;
+                        break;
+                    }
+                }
+                
+                // Simulate AI typing delay
+                setTimeout(() => {
+                    addAIMessage(response, 'ai');
+                }, 800);
+                
+                // Clear input if this came from the input field
+                if (question === aiInput.value) {
+                    aiInput.value = '';
+                }
+            }
+
+            // Add message to AI chat
+            function addAIMessage(text, sender) {
+                const message = document.createElement('div');
+                message.className = `ai-message ${sender}`;
+                message.textContent = text;
+                aiBody.insertBefore(message, aiBody.lastElementChild);
+                aiBody.scrollTop = aiBody.scrollHeight;
+            }
+
+            // Send AI message
+            function sendAIMessage() {
+                if (aiInput.value.trim() !== '') {
+                    askAI(aiInput.value.trim());
+                    aiInput.value = '';
+                }
+            }
+
+            // Global functions for inline event handlers
+            window.savePostChanges = function(postId) {
+                const post = samplePosts.find(p => p.id === postId);
+                if (post) {
+                    const editInput = document.querySelector(`#edit-image-preview-${postId}`).previousElementSibling;
+                    post.content = editInput.value.trim();
+                    post.impact = detectEnvironmentalImpact(post.content);
+                    post.isEditing = false;
+                    renderPosts();
+                }
+            };
+
+            window.cancelEdit = function(postId) {
+                const post = samplePosts.find(p => p.id === postId);
+                if (post) {
+                    post.isEditing = false;
+                    renderPosts();
+                }
+            };
+
+            window.removeEditImage = function(postId, index) {
+                const post = samplePosts.find(p => p.id === postId);
+                if (post) {
+                    post.images.splice(index, 1);
+                    renderPosts();
+                }
+            };
+        });
+    </script>
+</body>
+</html>

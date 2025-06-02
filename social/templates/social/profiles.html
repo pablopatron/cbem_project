@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Profiles - CBEM</title>
+    <style>
+        /* Color Palette */
+        :root {
+            --dark-green: #123524;
+            --medium-green: #3E7B27;
+            --light-green: #85A947;
+            --cream: #EFE3C2;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333333;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--dark-gray);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background-color: var(--dark-green);
+            position: fixed;
+            top: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            margin-right: 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .search-bar {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            width: 200px;
+            outline: none;
+        }
+
+        .search-bar i {
+            margin-left: -30px;
+            color: var(--dark-green);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: var(--dark-green);
+            padding: 20px;
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .mobile-menu.show {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .mobile-menu a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .mobile-menu a.active {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            margin-top: 60px;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--cream);
+            padding: 20px;
+            height: calc(100vh - 60px);
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-green);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .trending-item, .event-item, .friend-item, .group-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(18, 53, 36, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+            padding: 8px;
+        }
+
+        .trending-item:hover, .event-item:hover, .friend-item:hover, .group-item:hover {
+            background-color: rgba(133, 169, 71, 0.2);
+        }
+
+        .trending-item:last-child, .event-item:last-child, .friend-item:last-child, .group-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-item i, .event-item i {
+            margin-right: 10px;
+            color: var(--medium-green);
+        }
+
+        .friend-avatar, .group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .friend-info, .group-info {
+            flex: 1;
+        }
+
+        .friend-name, .group-name {
+            font-weight: 500;
+        }
+
+        .friend-score, .group-members {
+            font-size: 12px;
+            color: var(--dark-green);
+        }
+
+        /* Profiles Content */
+        .profiles-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 20px;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .search-container i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--medium-green);
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-tab {
+            padding: 8px 15px;
+            background-color: var(--cream);
+            border: 1px solid var(--medium-green);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .filter-tab:hover, .filter-tab.active {
+            background-color: var(--medium-green);
+            color: white;
+        }
+
+        /* Profiles Grid */
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .profile-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .profile-cover {
+            height: 120px;
+            background-color: var(--light-green);
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            position: absolute;
+            bottom: -40px;
+            left: 20px;
+            border: 3px solid var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .profile-info {
+            padding: 50px 20px 20px;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .profile-username {
+            color: var(--medium-green);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .profile-bio {
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .eco-score {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .eco-score-label {
+            font-size: 14px;
+            margin-right: 10px;
+            color: var(--dark-green);
+        }
+
+        .eco-score-value {
+            font-weight: bold;
+            color: var(--medium-green);
+        }
+
+        .eco-score-bar-container {
+            flex: 1;
+            height: 6px;
+            background-color: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .eco-score-bar {
+            height: 100%;
+            background-color: var(--medium-green);
+            border-radius: 3px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--dark-gray);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .profile-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .profile-btn.primary {
+            background-color: var(--medium-green);
+            color: white;
+        }
+
+        .profile-btn.primary:hover {
+            background-color: var(--dark-green);
+        }
+
+        .profile-btn.secondary {
+            background-color: var(--cream);
+            color: var(--dark-green);
+            border: 1px solid var(--medium-green);
+        }
+
+        .profile-btn.secondary:hover {
+            background-color: rgba(133, 169, 71, 0.2);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+
+        .pagination-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination-btn:hover, .pagination-btn.active {
+            background-color: var(--medium-green);
+            color: white;
+            border-color: var(--medium-green);
+        }
+
+        /* AI Window */
+        .ai-window {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background-color: var(--cream);
+            border: 2px solid var(--medium-green);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .ai-window.minimized {
+            transform: translateY(calc(100% - 45px));
+        }
+
+        .ai-header {
+            background-color: var(--medium-green);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .ai-title {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .ai-avatar {
+            width: 30px;
+            height: 30px;
+            background-color: var(--cream);
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--medium-green);
+        }
+
+        .ai-body {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .ai-body.hidden {
+            display: none;
+        }
+
+        .ai-message {
+            background-color: var(--white);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .ai-message.user {
+            background-color: var(--light-green);
+            color: white;
+            margin-left: 20px;
+        }
+
+        .ai-message.ai {
+            background-color: var(--white);
+            margin-right: 20px;
+        }
+
+        .ai-quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .ai-quick-action {
+            background-color: var(--white);
+            border: 1px solid var(--medium-green);
+            color: var(--dark-green);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ai-quick-action:hover {
+            background-color: var(--medium-green);
+            color: white;
+        }
+
+        .ai-input {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .ai-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px 0 0 20px;
+            outline: none;
+        }
+
+        .ai-input button {
+            background-color: var(--medium-green);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+        }
+
+        .ai-suggestion {
+            font-size: 12px;
+            color: var(--dark-green);
+            margin-top: 10px;
+            padding: 8px;
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .ai-suggestion:hover {
+            background-color: var(--white);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 250px;
+            }
+            .profiles-content {
+                margin-left: 250px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                display: none;
+            }
+            .profiles-content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .profiles-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar input {
+                width: 150px;
+            }
+            .search-container {
+                width: 200px;
+            }
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .search-container {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-links {
+                display: none;
+            }
+            .search-bar {
+                margin-left: auto;
+            }
+            .search-bar input {
+                width: 120px;
+            }
+            .profiles-grid {
+                grid-template-columns: 1fr;
+            }
+            .ai-window {
+                width: 280px;
+                right: 10px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">CBEM</div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links">
+            <a href="#"><i class="fas fa-home"></i> Home</a>
+            <a href="#"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" class="active"><i class="fas fa-users"></i> Profiles</a>
+            <a href="#"><i class="fas fa-envelope"></i> Messages</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search CBEM">
+            <i class="fas fa-search"></i>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#"><i class="fas fa-home"></i> Home</a>
+        <a href="#"><i class="fas fa-user"></i> Profile</a>
+        <a href="#" class="active"><i class="fas fa-users"></i> Profiles</a>
+        <a href="#"><i class="fas fa-envelope"></i> Messages</a>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-fire"></i> Trending Topics</h3>
+                <div class="trending-item" onclick="navigateTo('#ZeroWasteChallenge')">
+                    <i class="fas fa-leaf"></i> #ZeroWasteChallenge
+                </div>
+                <div class="trending-item" onclick="navigateTo('#PlasticFreeJuly')">
+                    <i class="fas fa-recycle"></i> #PlasticFreeJuly
+                </div>
+                <div class="trending-item" onclick="navigateTo('#UrbanGardening')">
+                    <i class="fas fa-tree"></i> #UrbanGardening
+                </div>
+                <div class="trending-item" onclick="navigateTo('#RenewableEnergy')">
+                    <i class="fas fa-bolt"></i> #RenewableEnergy
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-calendar"></i> Local Events</h3>
+                <div class="event-item" onclick="navigateTo('CommunityTreePlanting')">
+                    <i class="fas fa-seedling"></i> Community Tree Planting - Sat
+                </div>
+                <div class="event-item" onclick="navigateTo('BeachCleanup')">
+                    <i class="fas fa-trash-restore"></i> Beach Cleanup - Sun
+                </div>
+                <div class="event-item" onclick="navigateTo('SolarPowerWorkshop')">
+                    <i class="fas fa-solar-panel"></i> Solar Power Workshop
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-users"></i> Friends</h3>
+                <div class="friend-item" onclick="navigateTo('JaneDoe')">
+                    <div class="friend-avatar">JD</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Jane Doe</div>
+                        <div class="friend-score">Eco Score: 85%</div>
+                    </div>
+                </div>
+                <div class="friend-item" onclick="navigateTo('JohnSmith')">
+                    <div class="friend-avatar">JS</div>
+                    <div class="friend-info">
+                        <div class="friend-name">John Smith</div>
+                        <div class="friend-score">Eco Score: 72%</div>
+                    </div>
+                </div>
+                <div class="friend-item" onclick="navigateTo('AlexMorgan')">
+                    <div class="friend-avatar">AM</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Alex Morgan</div>
+                        <div class="friend-score">Eco Score: 91%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-users"></i> Groups</h3>
+                <div class="group-item" onclick="navigateTo('ZeroWasteLiving')">
+                    <div class="group-avatar"><i class="fas fa-recycle"></i></div>
+                    <div class="group-info">
+                        <div class="group-name">Zero Waste Living</div>
+                        <div class="group-members">1.2k members</div>
+                    </div>
+                </div>
+                <div class="group-item" onclick="navigateTo('UrbanCyclists')">
+                    <div class="group-avatar"><i class="fas fa-bicycle"></i></div>
+                    <div class="group-info">
+                        <div class="group-name">Urban Cyclists</div>
+                        <div class="group-members">856 members</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Profiles Content -->
+        <main class="profiles-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Community Members</h1>
+                <div class="search-container">
+                    <input type="text" placeholder="Search members...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <div class="filter-tab active">All Members</div>
+                <div class="filter-tab">Friends</div>
+                <div class="filter-tab">Eco Leaders</div>
+                <div class="filter-tab">Near You</div>
+                <div class="filter-tab">New Members</div>
+                <div class="filter-tab">Following</div>
+            </div>
+
+            <!-- Profiles Grid -->
+            <div class="profiles-grid">
+                <!-- Profile Card 1 -->
+                <div class="profile-card" onclick="navigateTo('JaneDoe')">
+                    <div class="profile-cover" style="background-color: #7AA582;"></div>
+                    <div class="profile-avatar">JD</div>
+                    <div class="profile-info">
+                        <h3 class="profile-name">Jane Doe</h3>
+                        <div class="profile-username">@janedoe</div>
+                        <p class="profile-bio">
+                            Sustainability consultant passionate about zero waste living and circular economy solutions.
+                        </p>
+                        <div class="eco-score">
+                            <span class="eco-score-label">Eco Score:</span>
+                            <span class="eco-score-value">85%</span>
+                            <div class="eco-score-bar-container">
+                                <div class="eco-score-bar" style="width: 85%;"></div>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">142</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">356</div>
+                                <div class="stat-label">Friends</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">12</div>
+                                <div class="stat-label">Groups</div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="profile-btn primary">Follow</button>
+                            <button class="profile-btn secondary">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Card 2 -->
+                <div class="profile-card" onclick="navigateTo('JohnSmith')">
+                    <div class="profile-cover" style="background-color: #6B9C7D;"></div>
+                    <div class="profile-avatar">JS</div>
+                    <div class="profile-info">
+                        <h3 class="profile-name">John Smith</h3>
+                        <div class="profile-username">@johnsmith</div>
+                        <p class="profile-bio">
+                            Urban gardener and beekeeper. Teaching sustainable agriculture practices in urban environments.
+                        </p>
+                        <div class="eco-score">
+                            <span class="eco-score-label">Eco Score:</span>
+                            <span class="eco-score-value">72%</span>
+                            <div class="eco-score-bar-container">
+                                <div class="eco-score-bar" style="width: 72%;"></div>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">89</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">215</div>
+                                <div class="stat-label">Friends</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">8</div>
+                                <div class="stat-label">Groups</div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="profile-btn primary">Follow</button>
+                            <button class="profile-btn secondary">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Card 3 -->
+                <div class="profile-card" onclick="navigateTo('AlexMorgan')">
+                    <div class="profile-cover" style="background-color: #5C8D6E;"></div>
+                    <div class="profile-avatar">AM</div>
+                    <div class="profile-info">
+                        <h3 class="profile-name">Alex Morgan</h3>
+                        <div class="profile-username">@alexmorgan</div>
+                        <p class="profile-bio">
+                            Renewable energy engineer working on solar solutions for developing communities.
+                        </p>
+                        <div class="eco-score">
+                            <span class="eco-score-label">Eco Score:</span>
+                            <span class="eco-score-value">91%</span>
+                            <div class="eco-score-bar-container">
+                                <div class="eco-score-bar" style="width: 91%;"></div>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">203</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">421</div>
+                                <div class="stat-label">Friends</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">15</div>
+                                <div class="stat-label">Groups</div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="profile-btn primary">Follow</button>
+                            <button class="profile-btn secondary">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Card 4 -->
+                <div class="profile-card" onclick="navigateTo('SarahJohnson')">
+                    <div class="profile-cover" style="background-color: #4D7E5F;"></div>
+                    <div class="profile-avatar">SJ</div>
+                    <div class="profile-info">
+                        <h3 class="profile-name">Sarah Johnson</h3>
+                        <div class="profile-username">@sarahj</div>
+                        <p class="profile-bio">
+                            Environmental educator creating programs to teach kids about sustainability and conservation.
+                        </p>
+                        <div class="eco-score">
+                            <span class="eco-score-label">Eco Score:</span>
+                            <span class="eco-score-value">78%</span>
+                            <div class="eco-score-bar-container">
+                                <div class="eco-score-bar" style="width: 78%;"></div>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">156</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">312</div>
+                                <div class="stat-label">Friends</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">9</div>
+                                <div class="stat-label">Groups</div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="profile-btn primary">Follow</button>
+                            <button class="profile-btn secondary">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Card 5 -->
+                <div class="profile-card" onclick="navigateTo('MichaelBrown')">
+                    <div class="profile-cover" style="background-color: #3E6F50;"></div>
+                    <div class="profile-avatar">MB</div>
+                    <div class="profile-info">
+                        <h3 class="profile-name">Michael Brown</h3>
+                        <div class="profile-username">@michaelb</div>
+                        <p class="profile-bio">
+                            Founder of a zero-waste grocery store. Advocating for package-free shopping alternatives.
+                        </p>
+                        <div class="eco-score">
+                            <span class="eco-score-label">Eco Score:</span>
+                            <span class="eco-score-value">88%</span>
+                            <div class="eco-score-bar-container">
+                                <div class="eco-score-bar" style="width: 88%;"></div>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">178</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">287</div>
+                                <div class="stat-label">Friends</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">11</div>
+                                <div class="stat-label">Groups</div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="profile-btn primary">Follow</button>
+                            <button class="profile-btn secondary">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Card 6 -->
+                <div class="profile-card" onclick="navigateTo('EmilyDavis')">
+                    <div class="profile-cover" style="background-color: #2F6041;"></div>
+                    <div class="profile-avatar">ED</div>
+                    <div class="profile-info">
+                        <h3 class="profile-name">Emily Davis</h3>
+                        <div class="profile-username">@emilyd</div>
+                        <p class="profile-bio">
+                            Marine biologist focused on ocean conservation and reducing plastic pollution in our seas.
+                        </p>
+                        <div class="eco-score">
+                            <span class="eco-score-label">Eco Score:</span>
+                            <span class="eco-score-value">94%</span>
+                            <div class="eco-score-bar-container">
+                                <div class="eco-score-bar" style="width: 94%;"></div>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">231</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">376</div>
+                                <div class="stat-label">Friends</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">14</div>
+                                <div class="stat-label">Groups</div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="profile-btn primary">Follow</button>
+                            <button class="profile-btn secondary">Message</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+                <button class="pagination-btn">4</button>
+                <button class="pagination-btn">5</button>
+                <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Window -->
+    <div class="ai-window">
+        <div class="ai-header" id="ai-toggle">
+            <div class="ai-avatar"><i class="fas fa-leaf"></i></div>
+            <div class="ai-title">Environmental Assistant</div>
+            <i class="fas fa-chevron-down" id="ai-chevron"></i>
+        </div>
+        <div class="ai-body" id="ai-body">
+            <div class="ai-message ai">
+                Hello! I can help you connect with like-minded environmentalists. Would you like recommendations for people to follow based on your interests?
+            </div>
+            
+            <div class="ai-quick-actions">
+                <div class="ai-quick-action" data-question="Find people interested in zero waste living">
+                    <i class="fas fa-recycle"></i> Zero Waste
+                </div>
+                <div class="ai-quick-action" data-question="Find urban gardening experts">
+                    <i class="fas fa-tree"></i> Gardening
+                </div>
+                <div class="ai-quick-action" data-question="Find renewable energy professionals">
+                    <i class="fas fa-solar-panel"></i> Energy
+                </div>
+                <div class="ai-quick-action" data-question="Find local environmental activists">
+                    <i class="fas fa-users"></i> Local
+                </div>
+            </div>
+            
+            <div class="ai-suggestion" id="context-suggestion">
+                Based on your interests, I can recommend people who focus on sustainable living.
+            </div>
+            
+            <div class="ai-input">
+                <input type="text" id="ai-input" placeholder="Ask me about finding people...">
+                <button id="ai-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const aiToggle = document.getElementById('ai-toggle');
+            const aiBody = document.getElementById('ai-body');
+            const aiChevron = document.getElementById('ai-chevron');
+            const aiInput = document.getElementById('ai-input');
+            const aiSend = document.getElementById('ai-send');
+            const contextSuggestion = document.getElementById('context-suggestion');
+            const quickActions = document.querySelectorAll('.ai-quick-action');
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            const paginationBtns = document.querySelectorAll('.pagination-btn');
+
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('show');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!mobileMenu.contains(e.target) && e.target !== mobileMenuBtn) {
+                    mobileMenu.classList.remove('show');
+                }
+            });
+
+            // Filter tabs
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    // In a real app, this would filter the profiles
+                });
+            });
+
+            // Pagination buttons
+            paginationBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (!this.classList.contains('active')) {
+                        paginationBtns.forEach(b => b.classList.remove('active'));
+                        if (!this.querySelector('i')) {
+                            this.classList.add('active');
+                        }
+                    }
+                    // In a real app, this would load the appropriate page
+                });
+            });
+
+            // AI window toggle
+            let aiMinimized = false;
+            aiToggle.addEventListener('click', function() {
+                aiMinimized = !aiMinimized;
+                if (aiMinimized) {
+                    aiBody.classList.add('hidden');
+                    aiChevron.classList.remove('fa-chevron-down');
+                    aiChevron.classList.add('fa-chevron-up');
+                    document.querySelector('.ai-window').classList.add('minimized');
+                } else {
+                    aiBody.classList.remove('hidden');
+                    aiChevron.classList.remove('fa-chevron-up');
+                    aiChevron.classList.add('fa-chevron-down');
+                    document.querySelector('.ai-window').classList.remove('minimized');
+                }
+            });
+
+            // AI quick actions
+            quickActions.forEach(action => {
+                action.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    askAI(question);
+                });
+            });
+
+            // AI suggestion click
+            contextSuggestion.addEventListener('click', function() {
+                const suggestionText = this.textContent.replace('Based on your interests, I can recommend people who focus on ', '').replace('.', '');
+                askAI(suggestionText);
+            });
+
+            // AI send message
+            aiSend.addEventListener('click', sendAIMessage);
+            aiInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendAIMessage();
+                }
+            });
+
+            // AI responses database
+            const aiResponses = {
+                "default": "I can help you find people who share your environmental interests. Try asking about specific topics like 'zero waste' or 'renewable energy'.",
+                "Find people interested in zero waste living": "Here are some zero waste advocates you might want to connect with:\n1. @zerowasteguru - Shares daily tips for reducing waste\n2. @ecopackaging - Expert in sustainable packaging solutions\n3. @bulkbuyer - Organizes community bulk buying to reduce packaging",
+                "Find urban gardening experts": "Urban gardening experts in your network:\n1. @citygreenthumb - Rooftop gardening specialist\n2. @balconygardener - Small space gardening tips\n3. @compostqueen - Urban composting solutions",
+                "Find renewable energy professionals": "Renewable energy professionals to follow:\n1. @solarpioneer - Residential solar installations\n2. @windpowered - Wind energy researcher\n3. @greengrid - Sustainable energy grid solutions",
+                "Find local environmental activists": "Local activists near you:\n1. @cleanwaterlocal - Water conservation efforts\n2. @greencity2030 - Urban sustainability initiatives\n3. @bike4future - Promoting cycling infrastructure"
+            };
+
+            // Ask AI a question
+            function askAI(question) {
+                // Add user question to chat
+                addAIMessage(question, 'user');
+                
+                // Find response or use default
+                let response = aiResponses.default;
+                for (const [key, value] of Object.entries(aiResponses)) {
+                    if (question.toLowerCase().includes(key.toLowerCase())) {
+                        response = value;
+                        break;
+                    }
+                }
+                
+                // Simulate AI typing delay
+                setTimeout(() => {
+                    addAIMessage(response, 'ai');
+                }, 800);
+                
+                // Clear input if this came from the input field
+                if (question === aiInput.value) {
+                    aiInput.value = '';
+                }
+            }
+
+            // Add message to AI chat
+            function addAIMessage(text, sender) {
+                const message = document.createElement('div');
+                message.className = `ai-message ${sender}`;
+                message.textContent = text;
+                aiBody.insertBefore(message, aiBody.lastElementChild);
+                aiBody.scrollTop = aiBody.scrollHeight;
+            }
+
+            // Send AI message
+            function sendAIMessage() {
+                if (aiInput.value.trim() !== '') {
+                    askAI(aiInput.value.trim());
+                    aiInput.value = '';
+                }
+            }
+
+            // Navigation function
+            window.navigateTo = function(page) {
+                alert(`Navigating to ${page} profile. In a real application, this would load the profile page.`);
+            };
+        });
+    </script>
+</body>
+</html>

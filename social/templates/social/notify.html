@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - CBEM</title>
+    <style>
+        /* Color Palette */
+        :root {
+            --dark-green: #123524;
+            --medium-green: #3E7B27;
+            --light-green: #85A947;
+            --cream: #EFE3C2;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333333;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--dark-gray);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background-color: var(--dark-green);
+            position: fixed;
+            top: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            margin-right: 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .search-bar {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            width: 200px;
+            outline: none;
+        }
+
+        .search-bar i {
+            margin-left: -30px;
+            color: var(--dark-green);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: var(--dark-green);
+            padding: 20px;
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .mobile-menu.show {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .mobile-menu a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .mobile-menu a.active {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            margin-top: 60px;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--cream);
+            padding: 20px;
+            height: calc(100vh - 60px);
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-green);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .trending-item, .event-item, .friend-item, .group-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(18, 53, 36, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+            padding: 8px;
+        }
+
+        .trending-item:hover, .event-item:hover, .friend-item:hover, .group-item:hover {
+            background-color: rgba(133, 169, 71, 0.2);
+        }
+
+        .trending-item:last-child, .event-item:last-child, .friend-item:last-child, .group-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-item i, .event-item i {
+            margin-right: 10px;
+            color: var(--medium-green);
+        }
+
+        .friend-avatar, .group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .friend-info, .group-info {
+            flex: 1;
+        }
+
+        .friend-name, .group-name {
+            font-weight: 500;
+        }
+
+        .friend-score, .group-members {
+            font-size: 12px;
+            color: var(--dark-green);
+        }
+
+        /* Notifications Content */
+        .notifications-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 20px;
+            max-width: 800px;
+        }
+
+        /* Notifications Header */
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .notifications-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+
+        .notifications-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notifications-btn {
+            padding: 8px 15px;
+            background-color: var(--cream);
+            border: 1px solid var(--medium-green);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .notifications-btn:hover, .notifications-btn.active {
+            background-color: var(--medium-green);
+            color: white;
+        }
+
+        /* Notifications Tabs */
+        .notifications-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .notifications-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notifications-tab.active {
+            color: var(--medium-green);
+            font-weight: 500;
+        }
+
+        .notifications-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--medium-green);
+        }
+
+        .notifications-tab:hover:not(.active) {
+            background-color: var(--light-gray);
+        }
+
+        /* Notification Items */
+        .notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: var(--white);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .notification-item.unread {
+            background-color: rgba(133, 169, 71, 0.1);
+        }
+
+        .notification-item:hover {
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .notification-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-text {
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+
+        .notification-text strong {
+            color: var(--dark-green);
+            font-weight: 600;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .notification-action {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notification-action.primary {
+            background-color: var(--medium-green);
+            color: white;
+        }
+
+        .notification-action.primary:hover {
+            background-color: var(--dark-green);
+        }
+
+        .notification-action.secondary {
+            background-color: var(--cream);
+            color: var(--dark-green);
+            border: 1px solid var(--medium-green);
+        }
+
+        .notification-action.secondary:hover {
+            background-color: rgba(133, 169, 71, 0.2);
+        }
+
+        .notification-unread {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            position: absolute;
+            right: 15px;
+            top: 15px;
+        }
+
+        /* AI Window */
+        .ai-window {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background-color: var(--cream);
+            border: 2px solid var(--medium-green);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .ai-window.minimized {
+            transform: translateY(calc(100% - 45px));
+        }
+
+        .ai-header {
+            background-color: var(--medium-green);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .ai-title {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .ai-avatar {
+            width: 30px;
+            height: 30px;
+            background-color: var(--cream);
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--medium-green);
+        }
+
+        .ai-body {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .ai-body.hidden {
+            display: none;
+        }
+
+        .ai-message {
+            background-color: var(--white);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .ai-message.user {
+            background-color: var(--light-green);
+            color: white;
+            margin-left: 20px;
+        }
+
+        .ai-message.ai {
+            background-color: var(--white);
+            margin-right: 20px;
+        }
+
+        .ai-quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .ai-quick-action {
+            background-color: var(--white);
+            border: 1px solid var(--medium-green);
+            color: var(--dark-green);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ai-quick-action:hover {
+            background-color: var(--medium-green);
+            color: white;
+        }
+
+        .ai-input {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .ai-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px 0 0 20px;
+            outline: none;
+        }
+
+        .ai-input button {
+            background-color: var(--medium-green);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+        }
+
+        .ai-suggestion {
+            font-size: 12px;
+            color: var(--dark-green);
+            margin-top: 10px;
+            padding: 8px;
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .ai-suggestion:hover {
+            background-color: var(--white);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 250px;
+            }
+            .notifications-content {
+                margin-left: 250px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                display: none;
+            }
+            .notifications-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar input {
+                width: 150px;
+            }
+            .notifications-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .notifications-tabs {
+                overflow-x: auto;
+            }
+            .notifications-tab {
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-links {
+                display: none;
+            }
+            .search-bar {
+                margin-left: auto;
+            }
+            .search-bar input {
+                width: 120px;
+            }
+            .ai-window {
+                width: 280px;
+                right: 10px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">CBEM</div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links">
+            <a href="#"><i class="fas fa-home"></i> Home</a>
+            <a href="#"><i class="fas fa-user"></i> Profile</a>
+            <a href="#"><i class="fas fa-users"></i> Profiles</a>
+            <a href="#" class="active"><i class="fas fa-bell"></i> Notifications</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search CBEM">
+            <i class="fas fa-search"></i>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#"><i class="fas fa-home"></i> Home</a>
+        <a href="#"><i class="fas fa-user"></i> Profile</a>
+        <a href="#"><i class="fas fa-users"></i> Profiles</a>
+        <a href="#" class="active"><i class="fas fa-bell"></i> Notifications</a>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-fire"></i> Trending Topics</h3>
+                <div class="trending-item" onclick="navigateTo('#ZeroWasteChallenge')">
+                    <i class="fas fa-leaf"></i> #ZeroWasteChallenge
+                </div>
+                <div class="trending-item" onclick="navigateTo('#PlasticFreeJuly')">
+                    <i class="fas fa-recycle"></i> #PlasticFreeJuly
+                </div>
+                <div class="trending-item" onclick="navigateTo('#UrbanGardening')">
+                    <i class="fas fa-tree"></i> #UrbanGardening
+                </div>
+                <div class="trending-item" onclick="navigateTo('#RenewableEnergy')">
+                    <i class="fas fa-bolt"></i> #RenewableEnergy
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-calendar"></i> Local Events</h3>
+                <div class="event-item" onclick="navigateTo('CommunityTreePlanting')">
+                    <i class="fas fa-seedling"></i> Community Tree Planting - Sat
+                </div>
+                <div class="event-item" onclick="navigateTo('BeachCleanup')">
+                    <i class="fas fa-trash-restore"></i> Beach Cleanup - Sun
+                </div>
+                <div class="event-item" onclick="navigateTo('SolarPowerWorkshop')">
+                    <i class="fas fa-solar-panel"></i> Solar Power Workshop
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-users"></i> Friends</h3>
+                <div class="friend-item" onclick="navigateTo('JaneDoe')">
+                    <div class="friend-avatar">JD</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Jane Doe</div>
+                        <div class="friend-score">Eco Score: 85%</div>
+                    </div>
+                </div>
+                <div class="friend-item" onclick="navigateTo('JohnSmith')">
+                    <div class="friend-avatar">JS</div>
+                    <div class="friend-info">
+                        <div class="friend-name">John Smith</div>
+                        <div class="friend-score">Eco Score: 72%</div>
+                    </div>
+                </div>
+                <div class="friend-item" onclick="navigateTo('AlexMorgan')">
+                    <div class="friend-avatar">AM</div>
+                    <div class="friend-info">
+                        <div class="friend-name">Alex Morgan</div>
+                        <div class="friend-score">Eco Score: 91%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-users"></i> Groups</h3>
+                <div class="group-item" onclick="navigateTo('ZeroWasteLiving')">
+                    <div class="group-avatar"><i class="fas fa-recycle"></i></div>
+                    <div class="group-info">
+                        <div class="group-name">Zero Waste Living</div>
+                        <div class="group-members">1.2k members</div>
+                    </div>
+                </div>
+                <div class="group-item" onclick="navigateTo('UrbanCyclists')">
+                    <div class="group-avatar"><i class="fas fa-bicycle"></i></div>
+                    <div class="group-info">
+                        <div class="group-name">Urban Cyclists</div>
+                        <div class="group-members">856 members</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Notifications Content -->
+        <main class="notifications-content">
+            <!-- Notifications Header -->
+            <div class="notifications-header">
+                <h1 class="notifications-title">Notifications</h1>
+                <div class="notifications-actions">
+                    <button class="notifications-btn">Mark all as read</button>
+                    <button class="notifications-btn">Settings</button>
+                </div>
+            </div>
+
+            <!-- Notifications Tabs -->
+            <div class="notifications-tabs">
+                <div class="notifications-tab active">All</div>
+                <div class="notifications-tab">Mentions</div>
+                <div class="notifications-tab">Comments</div>
+                <div class="notifications-tab">Likes</div>
+                <div class="notifications-tab">Events</div>
+            </div>
+
+            <!-- Notification List -->
+            <div class="notification-list">
+                <!-- Notification Item 1 -->
+                <div class="notification-item unread">
+                    <div class="notification-avatar">JD</div>
+                    <div class="notification-content">
+                        <div class="notification-text">
+                            <strong>Jane Doe</strong> liked your post about bamboo toothbrushes
+                        </div>
+                        <div class="notification-time">2 minutes ago</div>
+                        <div class="notification-actions">
+                            <button class="notification-action primary">View Post</button>
+                            <button class="notification-action secondary">Thank</button>
+                        </div>
+                    </div>
+                    <div class="notification-unread"></div>
+                </div>
+
+                <!-- Notification Item 2 -->
+                <div class="notification-item unread">
+                    <div class="notification-avatar">AM</div>
+                    <div class="notification-content">
+                        <div class="notification-text">
+                            <strong>Alex Morgan</strong> commented on your community garden post: "Great initiative! I'd love to join next time."
+                        </div>
+                        <div class="notification-time">15 minutes ago</div>
+                        <div class="notification-actions">
+                            <button class="notification-action primary">Reply</button>
+                            <button class="notification-action secondary">View Post</button>
+                        </div>
+                    </div>
+                    <div class="notification-unread"></div>
+                </div>
+
+                <!-- Notification Item 3 -->
+                <div class="notification-item">
+                    <div class="notification-avatar">ZC</div>
+                    <div class="notification-content">
+                        <div class="notification-text">
+                            <strong>Zero Waste Challenge</strong> starts tomorrow! Don't forget to prepare your reusable containers.
+                        </div>
+                        <div class="notification-time">1 hour ago</div>
+                        <div class="notification-actions">
+                            <button class="notification-action primary">View Challenge</button>
+                            <button class="notification-action secondary">Remind me</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Item 4 -->
+                <div class="notification-item">
+                    <div class="notification-avatar">JS</div>
+                    <div class="notification-content">
+                        <div class="notification-text">
+                            <strong>John Smith</strong> mentioned you in a post about urban composting
+                        </div>
+                        <div class="notification-time">3 hours ago</div>
+                        <div class="notification-actions">
+                            <button class="notification-action primary">View Post</button>
+                            <button class="notification-action secondary">Reply</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Item 5 -->
+                <div class="notification-item">
+                    <div class="notification-avatar">UC</div>
+                    <div class="notification-content">
+                        <div class="notification-text">
+                            <strong>Urban Cyclists</strong> group has a new event: "Bike to Work Day" this Friday
+                        </div>
+                        <div class="notification-time">5 hours ago</div>
+                        <div class="notification-actions">
+                            <button class="notification-action primary">RSVP</button>
+                            <button class="notification-action secondary">Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Item 6 -->
+                <div class="notification-item">
+                    <div class="notification-avatar">ED</div>
+                    <div class="notification-content">
+                        <div class="notification-text">
+                            <strong>Emily Davis</strong> started following you
+                        </div>
+                        <div class="notification-time">1 day ago</div>
+                        <div class="notification-actions">
+                            <button class="notification-action primary">View Profile</button>
+                            <button class="notification-action secondary">Follow back</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Item 7 -->
+                <div class="notification-item">
+                    <div class="notification-avatar">SE</div>
+                    <div class="notification-content">
+                        <div class="notification-text">
+                            Your weekly <strong>sustainability report</strong> is ready. You saved 12kg of CO2 this week!
+                        </div>
+                        <div class="notification-time">2 days ago</div>
+                        <div class="notification-actions">
+                            <button class="notification-action primary">View Report</button>
+                            <button class="notification-action secondary">Share</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Window -->
+    <div class="ai-window">
+        <div class="ai-header" id="ai-toggle">
+            <div class="ai-avatar"><i class="fas fa-leaf"></i></div>
+            <div class="ai-title">Environmental Assistant</div>
+            <i class="fas fa-chevron-down" id="ai-chevron"></i>
+        </div>
+        <div class="ai-body" id="ai-body">
+            <div class="ai-message ai">
+                Hello! I can help you manage your notifications and environmental activities. How can I assist you today?
+            </div>
+            
+            <div class="ai-quick-actions">
+                <div class="ai-quick-action" data-question="How do I customize my notification settings?">
+                    <i class="fas fa-cog"></i> Notification Settings
+                </div>
+                <div class="ai-quick-action" data-question="What sustainability events are coming up?">
+                    <i class="fas fa-calendar"></i> Upcoming Events
+                </div>
+                <div class="ai-quick-action" data-question="How can I reduce notification overload?">
+                    <i class="fas fa-bell-slash"></i> Reduce Notifications
+                </div>
+                <div class="ai-quick-action" data-question="What are today's environmental tips?">
+                    <i class="fas fa-lightbulb"></i> Daily Tips
+                </div>
+            </div>
+            
+            <div class="ai-suggestion" id="context-suggestion">
+                Based on your recent activity, would you like tips for managing group notifications?
+            </div>
+            
+            <div class="ai-input">
+                <input type="text" id="ai-input" placeholder="Ask me about notifications...">
+                <button id="ai-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const aiToggle = document.getElementById('ai-toggle');
+            const aiBody = document.getElementById('ai-body');
+            const aiChevron = document.getElementById('ai-chevron');
+            const aiInput = document.getElementById('ai-input');
+            const aiSend = document.getElementById('ai-send');
+            const contextSuggestion = document.getElementById('context-suggestion');
+            const quickActions = document.querySelectorAll('.ai-quick-action');
+            const notificationTabs = document.querySelectorAll('.notifications-tab');
+            const notificationItems = document.querySelectorAll('.notification-item');
+            const markAllReadBtn = document.querySelector('.notifications-btn');
+
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('show');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!mobileMenu.contains(e.target) && e.target !== mobileMenuBtn) {
+                    mobileMenu.classList.remove('show');
+                }
+            });
+
+            // Notification tabs
+            notificationTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    notificationTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    // In a real app, this would filter notifications
+                });
+            });
+
+            // Mark all as read
+            markAllReadBtn.addEventListener('click', function() {
+                notificationItems.forEach(item => {
+                    item.classList.remove('unread');
+                    const unreadDot = item.querySelector('.notification-unread');
+                    if (unreadDot) {
+                        unreadDot.remove();
+                    }
+                });
+            });
+
+            // Notification item click
+            notificationItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on buttons inside
+                    if (!e.target.classList.contains('notification-action')) {
+                        this.classList.remove('unread');
+                        const unreadDot = this.querySelector('.notification-unread');
+                        if (unreadDot) {
+                            unreadDot.remove();
+                        }
+                        // In a real app, this would navigate to the relevant content
+                    }
+                });
+            });
+
+            // AI window toggle
+            let aiMinimized = false;
+            aiToggle.addEventListener('click', function() {
+                aiMinimized = !aiMinimized;
+                if (aiMinimized) {
+                    aiBody.classList.add('hidden');
+                    aiChevron.classList.remove('fa-chevron-down');
+                    aiChevron.classList.add('fa-chevron-up');
+                    document.querySelector('.ai-window').classList.add('minimized');
+                } else {
+                    aiBody.classList.remove('hidden');
+                    aiChevron.classList.remove('fa-chevron-up');
+                    aiChevron.classList.add('fa-chevron-down');
+                    document.querySelector('.ai-window').classList.remove('minimized');
+                }
+            });
+
+            // AI quick actions
+            quickActions.forEach(action => {
+                action.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    askAI(question);
+                });
+            });
+
+            // AI suggestion click
+            contextSuggestion.addEventListener('click', function() {
+                const suggestionText = this.textContent.replace('Based on your recent activity, would you like tips for ', '').replace('?', '');
+                askAI(suggestionText);
+            });
+
+            // AI send message
+            aiSend.addEventListener('click', sendAIMessage);
+            aiInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendAIMessage();
+                }
+            });
+
+            // AI responses database
+            const aiResponses = {
+                "default": "I can help you with your notifications and environmental activities. Here are some things I can assist with:\n- Customizing notification settings\n- Finding upcoming sustainability events\n- Managing group notifications\n- Providing daily eco-tips",
+                "How do I customize my notification settings?": "You can customize your notification settings by:\n1. Clicking the 'Settings' button in notifications\n2. Adjusting preferences for each notification type\n3. Setting quiet hours if needed\n4. Choosing which groups can notify you",
+                "What sustainability events are coming up?": "Upcoming events in your area:\n- Community Tree Planting (Saturday)\n- Beach Cleanup (Sunday)\n- Solar Power Workshop (Next Wednesday)\n- Zero Waste Cooking Class (Friday)",
+                "How can I reduce notification overload?": "To reduce notification overload:\n• Turn off non-essential notifications\n• Set specific times to check notifications\n• Use the 'Mute' feature for busy groups\n• Prioritize notifications from close friends\n• Adjust notification sounds/vibrations",
+                "What are today's environmental tips?": "Today's environmental tips:\n1. Try a meatless meal to reduce carbon footprint\n2. Use a reusable water bottle instead of plastic\n3. Turn off lights when leaving a room\n4. Check your home for water leaks\n5. Plan errands to minimize car trips",
+                "managing group notifications": "For managing group notifications:\n• Set custom notification levels for each group\n• Use 'Mute' for very active groups\n• Enable only important announcements\n• Create notification filters based on keywords\n• Adjust notification frequency in group settings"
+            };
+
+            // Ask AI a question
+            function askAI(question) {
+                // Add user question to chat
+                addAIMessage(question, 'user');
+                
+                // Find response or use default
+                let response = aiResponses.default;
+                for (const [key, value] of Object.entries(aiResponses)) {
+                    if (question.toLowerCase().includes(key.toLowerCase())) {
+                        response = value;
+                        break;
+                    }
+                }
+                
+                // Simulate AI typing delay
+                setTimeout(() => {
+                    addAIMessage(response, 'ai');
+                }, 800);
+                
+                // Clear input if this came from the input field
+                if (question === aiInput.value) {
+                    aiInput.value = '';
+                }
+            }
+
+            // Add message to AI chat
+            function addAIMessage(text, sender) {
+                const message = document.createElement('div');
+                message.className = `ai-message ${sender}`;
+                message.textContent = text;
+                aiBody.insertBefore(message, aiBody.lastElementChild);
+                aiBody.scrollTop = aiBody.scrollHeight;
+            }
+
+            // Send AI message
+            function sendAIMessage() {
+                if (aiInput.value.trim() !== '') {
+                    askAI(aiInput.value.trim());
+                    aiInput.value = '';
+                }
+            }
+
+            // Navigation function
+            window.navigateTo = function(page) {
+                alert(`Navigating to ${page}. In a real application, this would load the appropriate content.`);
+            };
+        });
+    </script>
+</body>
+</html>
